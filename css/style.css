@@ -124,7 +124,7 @@ p, h1, dl, dd { margin: 0; }
 
 /* ── when ───────────────────────────────────────────────── */
 .when {
-  position: relative; z-index: 2; background: var(--bg);
+  position: relative; z-index: 3; background: var(--bg);
   padding: 14svh var(--gutter) 16svh; display: grid; justify-items: center; text-align: center; gap: 0;
 }
 .when__day { font-size: clamp(14px, 1.8vw, 18px); letter-spacing: .34em; color: var(--dim); margin-bottom: 10px; padding-left: .34em; }
@@ -147,7 +147,7 @@ p, h1, dl, dd { margin: 0; }
 /* ── card ───────────────────────────────────────────────── */
 .card { position: relative; z-index: 2; background: var(--bg); padding: 6svh var(--gutter) 12svh; display: grid; justify-items: center; gap: 22px; }
 .card__tray {
-  position: relative; width: min(84vw, 430px); aspect-ratio: 410 / 644; container-type: size; outline: none;
+  position: relative; width: min(84vw, 430px); aspect-ratio: 410 / 644; container-type: size; outline: none; overflow: hidden;
   cursor: pointer; -webkit-user-select: none; user-select: none; transform: translateY(40px); opacity: 0;
 }
 .card__still { position: absolute; height: 186.3%; width: auto; left: 50%; top: -42.2%; transform: translateX(-50%); max-width: none; pointer-events: none; }

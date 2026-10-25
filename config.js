@@ -12,5 +12,6 @@ window.PROUD_CONFIG = {
   rsvpUrl: '',               // e.g. 'https://wa.me/9665XXXXXXXX?text=I%27m%20in'
   rsvpLabel: 'rsvp',
   calendar: true,            // show "add to calendar"
+  sound: true,               // play the film's sound by default (browsers may hold it until the first tap)
   eventTitle: 'PROUD _ sweet bar · opening',
 };

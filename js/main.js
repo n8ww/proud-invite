@@ -17,6 +17,8 @@
   const HANDOFF_LEAD = 0.22;
 
   let introDone = false, filmBusy = false;
+  const soundPref = cfg.sound !== false;   // sound by default; browsers may still block it until the first tap
+  let soundBlocked = false;
 
   /* ── config → DOM ─────────────────────────────────────── */
   const name = (() => {
@@ -113,12 +115,11 @@
     sweep(heroGlint, 0.7);
     gsap.to(tray, { opacity: 1, duration: 0.22, delay: 0.2, ease: 'power1.inOut' });
     // hard guarantee (independent of the animation ticker): the footage is gone and the crisp tray is up
-    setTimeout(() => { gsap.set([video, filmVelvet], { opacity: 0 }); gsap.set(tray, { opacity: 1 }); if (!withSound) video.pause(); }, 800);
+    setTimeout(() => { gsap.set([video, filmVelvet], { opacity: 0 }); gsap.set(tray, { opacity: 1 }); if (video.muted) { video.pause(); filmBusy = false; } }, 800);
     gsap.to(filmVelvet, { opacity: 0, duration: 0.2, delay: 0.34 });
     gsap.to(video, { opacity: 0, duration: 0.2, delay: 0.34, onComplete: () => {
-      if (!withSound) video.pause();
+      if (video.muted) { video.pause(); filmBusy = false; }
       else video.addEventListener('ended', () => { filmBusy = false; soundBtn.classList.remove('is-playing'); }, { once: true });
-      if (!withSound) filmBusy = false;
     } });
   }
 
@@ -184,6 +185,14 @@
     addEventListener('touchstart', e => { touchY = e.touches[0].clientY; }, { passive: true });
     addEventListener('touchmove', e => { if (touchY !== null && Math.abs(e.touches[0].clientY - touchY) > 14) skip('touch'); }, { passive: true });
     addEventListener('keydown', e => { if ([' ', 'ArrowDown', 'PageDown', 'End'].includes(e.key)) skip('key'); });
+    // first real tap/click/key = user activation: let the sound in while the turn is still running
+    const unlock = () => {
+      if (!soundPref) return;
+      if (!video.paused && video.muted && video.currentTime < 7.6) { video.muted = false; dbg('unmuted on gesture'); }
+      soundBlocked = false;
+      removeEventListener('pointerdown', unlock); removeEventListener('keydown', unlock);
+    };
+    addEventListener('pointerdown', unlock); addEventListener('keydown', unlock);
     // if the guest leaves the tab mid-intro (app switch, notification), resolve to the rest state at once
     document.addEventListener('visibilitychange', () => { if (document.hidden && !introDone) { dbg('hidden mid-intro'); finishIntro(); } });
 
@@ -196,7 +205,15 @@
     if (ok) {
       filmBusy = true;
       try {
-        await Promise.race([video.play(), new Promise((_, rej) => setTimeout(() => rej(new Error('play timeout')), 1200))]);
+        video.muted = !soundPref;
+        try {
+          await Promise.race([video.play(), new Promise((_, rej) => setTimeout(() => rej(new Error('play timeout')), 1200))]);
+        } catch (e) {
+          if (video.muted) throw e;
+          // autoplay with sound refused — run it muted and unmute on the first tap
+          dbg('sound autoplay blocked', e && e.name); soundBlocked = true; video.muted = true;
+          await Promise.race([video.play(), new Promise((_, rej) => setTimeout(() => rej(new Error('play timeout')), 1200))]);
+        }
         // the film must be running from the edge-on frame; otherwise re-seek once, then give up on it
         if (video.currentTime < TURN_START - 0.4) {
           video.currentTime = TURN_START;
@@ -240,7 +257,7 @@
     sweep(heroGlint, 0.6);
     gsap.to(tray, { opacity: 0, duration: 0.25, delay: 0.25 });
     await new Promise(r => setTimeout(r, 450));
-    const ok = await playTurn({ withSound: false });
+    const ok = await playTurn({ withSound: soundPref });
     if (!ok) gsap.to(tray, { opacity: 1, duration: 0.3 });
   }
   $('.stage').addEventListener('click', e => { if (!e.target.closest('.chrome')) replayTurn(); });
