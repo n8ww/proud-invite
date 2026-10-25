@@ -274,7 +274,8 @@
     }
     if (reduce) return;
     // hero recedes as the lines slide over it
-    gsap.to(sticky, { scale: 0.94, opacity: 0.18, ease: 'none', scrollTrigger: { trigger: '.hero', start: '45% top', end: 'bottom top', scrub: true } });
+    gsap.to(sticky, { scale: 0.94, opacity: 0.18, ease: 'none', scrollTrigger: { trigger: '.lines', start: 'top bottom', end: 'top 10%', scrub: true } });
+    setupScrub();
     gsap.to(cue, { opacity: 0, ease: 'none', scrollTrigger: { trigger: '.hero', start: '2% top', end: '14% top', scrub: true } });
 
     $$('.lines__line').forEach(line => {
@@ -298,6 +299,47 @@
     cardEl.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); polish(); } });
 
     gsap.from('.end > *', { opacity: 0, y: 12, duration: 1.1, ease: 'power2.out', stagger: 0.1, scrollTrigger: { trigger: '.end', start: 'top 80%', once: true } });
+  }
+
+  /* ── scroll turns the tray (96 normalised frames of the film) ── */
+  const FRAMES = 96;
+  const frames = new Array(FRAMES);
+  let framesStarted = false;
+  function loadFrames(onFrame) {
+    if (framesStarted) return; framesStarted = true;
+    const order = []; [8, 4, 2, 1].forEach(step => { for (let i = 0; i < FRAMES; i += step) if (!order.includes(i)) order.push(i); });
+    let idx = 0;
+    const worker = async () => { while (idx < order.length) { const i = order[idx++]; await new Promise(res => { const im = new Image(); im.decoding = 'async'; im.onload = () => { frames[i] = im; onFrame(i); res(); }; im.onerror = res; im.src = `assets/frames/f${String(i).padStart(3, '0')}.webp`; }); } };
+    for (let k = 0; k < 6; k++) worker();
+  }
+  function setupScrub() {
+    const canvas = $('.turn'); if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let want = 0, drawn = null, lastP = 0, scrubSound = false;
+    const nearest = i => { if (frames[i]) return frames[i]; for (let d = 1; d < FRAMES; d++) { if (frames[i - d]) return frames[i - d]; if (frames[i + d]) return frames[i + d]; } return null; };
+    const draw = () => { const im = nearest(want); if (!im || im === drawn) return; drawn = im; ctx.drawImage(im, 0, 0, canvas.width, canvas.height); };
+    const ramp = (p, a, b) => Math.max(0, Math.min(1, (p - a) / (b - a)));
+    const update = p => {
+      want = Math.round(p * (FRAMES - 1)); draw();
+      // crossfade: crisp tray at both ends, the film frames in between, velvet over the bowl while it turns
+      const film = p < 0.5 ? ramp(p, 0.0, 0.035) : ramp(1 - p, 0.0, 0.035);
+      const velvet = p < 0.5 ? ramp(p, 0.015, 0.09) : ramp(1 - p, 0.015, 0.09);
+      gsap.set(canvas, { opacity: film });
+      gsap.set(filmVelvet, { opacity: velvet * 0.92 });
+      if (introDone && !filmBusy) gsap.set(tray, { opacity: 1 - film });
+      if (p > 0.02 && lastP <= 0.02 && introDone && !filmBusy && soundPref && !scrubSound) {
+        // the film's own sound design under the turn (plays only where the browser allows audio)
+        scrubSound = true; video.muted = false; try { video.currentTime = 0; video.play().catch(() => { video.muted = true; }); } catch (e) {}
+      }
+      if (p < 0.01 && lastP >= 0.01) scrubSound = false;
+      lastP = p;
+    };
+    const proxy = { p: 0 };
+    gsap.to(proxy, { p: 1, ease: 'none', onUpdate: () => update(proxy.p),
+      scrollTrigger: { trigger: '.hero', start: 'top top', end: () => '+=' + Math.round(innerHeight * 2.6), scrub: 0.35, invalidateOnRefresh: true } });
+    // frames arrive while the guest reads the hero; redraw as they land
+    const begin = () => loadFrames(i => { if (Math.abs(i - want) < 3 || !drawn) draw(); });
+    if (introDone) begin(); else setTimeout(begin, 2500);
   }
 
   /* ── boot ─────────────────────────────────────────────── */

@@ -48,8 +48,9 @@ p, h1, dl, dd { margin: 0; }
 .chrome__sound:hover, .chrome__sound.is-playing { color: var(--ink); }
 
 /* ── hero ───────────────────────────────────────────────── */
-.hero { position: relative; height: 150svh; height: 150vh; }
-@supports (height: 100svh) { .hero { height: 150svh; } }
+/* 100svh hero + 260svh of scroll that turns the tray + 100svh where the next section slides over it */
+.hero { position: relative; height: 460vh; }
+@supports (height: 100svh) { .hero { height: 460svh; } }
 .hero__sticky { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
 .stage { position: absolute; inset: 0; display: grid; place-items: center; overflow: hidden; user-select: none; -webkit-user-select: none; }
 .stage__frame {
@@ -87,6 +88,10 @@ p, h1, dl, dd { margin: 0; }
 .tray__brand { top: 57.5%; display: flex; justify-content: center; align-items: baseline; gap: .55em; font-size: 3.5cqh; opacity: 0; }
 .tray__brand .wordmark { font-size: 2.9em; align-self: center; clip-path: inset(0 100% 0 0); }
 .tray__when { top: 68.5%; font-size: 3.2cqh; line-height: 1.25; letter-spacing: .02em; opacity: 0; }
+.turn {
+  position: absolute; left: calc(50% - 31.94%); top: calc(var(--tray-cy) - 25.78%); width: 63.9%; height: 51.56%;
+  opacity: 0; pointer-events: none; will-change: opacity;
+}
 .film__velvet {
   position: absolute; left: calc(50% - var(--tray-w) * .36); top: calc(var(--tray-cy) - var(--tray-h) * .37); width: calc(var(--tray-w) * .72); height: calc(var(--tray-h) * .74);
   border-radius: 50%; opacity: 0; pointer-events: none;
