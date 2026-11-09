@@ -129,6 +129,7 @@ p, h1, dl, dd { margin: 0; }
 }
 .when__day { font-size: clamp(14px, 1.8vw, 18px); letter-spacing: .34em; color: var(--dim); margin-bottom: 10px; padding-left: .34em; }
 .when__date { font-weight: 600; font-size: clamp(52px, 15vw, 168px); line-height: 1; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.when__time { font-weight: 500; font-size: clamp(22px, 4.4vw, 46px); line-height: 1.1; letter-spacing: .01em; margin-top: 16px; }
 .when__rule { display: block; width: min(60vw, 420px); height: 1px; margin: 34px 0 30px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent); transform: scaleX(0); }
 .when__details { display: grid; gap: 10px; margin-bottom: 30px; font-size: clamp(16px, 2.2vw, 22px); }
 .when__details div { display: flex; gap: 14px; justify-content: center; align-items: baseline; }
@@ -153,14 +154,15 @@ p, h1, dl, dd { margin: 0; }
 .card__still { position: absolute; height: 186.3%; width: auto; left: 50%; top: -42.2%; transform: translateX(-50%); max-width: none; pointer-events: none; }
 .card__text { position: absolute; inset: 0; text-align: center; color: var(--ink); }
 .card__text > * { position: absolute; left: 10%; right: 10%; }
-.card__title { top: 31.3%; font-weight: 600; font-size: 5.6cqh; line-height: 1.12; letter-spacing: -.005em; }
+.card__title { top: 28.8%; font-weight: 600; font-size: 5.6cqh; line-height: 1.12; letter-spacing: -.005em; }
 .card__title em { font-style: normal; color: var(--orange); }
-.card__body { top: 46.4%; font-weight: 500; font-size: 3.1cqh; line-height: 1.32; }
-.card__name { top: 58.2%; font-size: 2.6cqh; color: var(--orange); letter-spacing: .04em; }
-.card__brand { top: 62.4%; display: flex; justify-content: center; align-items: baseline; gap: .55em; font-size: 3.1cqh; }
+.card__body { top: 43.2%; font-weight: 500; font-size: 3.1cqh; line-height: 1.32; }
+.card__name { top: 55.9%; font-size: 2.6cqh; color: var(--orange); letter-spacing: .04em; }
+.card__brand { top: 59%; display: flex; justify-content: center; align-items: baseline; gap: .55em; font-size: 3.1cqh; }
 .card__brand .wordmark { font-size: 2.9em; align-self: center; }
-.card__square { top: 69.4%; left: 50% !important; right: auto !important; width: 6.5cqh; height: 6.5cqh; transform: translateX(-50%); background: #fff; }
-.card__when { top: 77%; font-size: 2.8cqh; line-height: 1.25; letter-spacing: .02em; }
+.card__square { top: 64.6%; left: 50% !important; right: auto !important; width: 10cqh; height: 10cqh; transform: translateX(-50%); background: #fff; display: block; }
+.card__square img { width: 100%; height: 100%; display: block; }
+.card__when { top: 76%; font-size: 2.8cqh; line-height: 1.25; letter-spacing: .02em; }
 
 /* ── end ────────────────────────────────────────────────── */
 .end { position: relative; z-index: 2; background: var(--bg); padding: 12svh var(--gutter) calc(env(safe-area-inset-bottom) + 14svh); display: grid; justify-items: center; text-align: center; gap: 18px; }
@@ -175,3 +177,6 @@ html.reduced .tray__brand .wordmark { clip-path: none; }
 html.reduced .scroll-cue { opacity: 1; } html.reduced .scroll-cue i { transform: none; }
 html.reduced .when__rule { transform: none; }
 html.reduced .blade, html.reduced .film { display: none; }
+
+/* the hidden attribute always wins over component display rules */
+[hidden] { display: none !important; }

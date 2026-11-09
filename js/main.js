@@ -26,13 +26,18 @@
     const h = hp.get('to') || hp.get('name') || sp.get('to') || sp.get('name');
     return h ? h.trim().slice(0, 40) : '';
   })();
-  $$('[data-day]').forEach(el => el.textContent = cfg.dayLabel || 'saturday');
-  $$('[data-date]').forEach(el => el.textContent = cfg.dateLabel || '10.10.2026');
+  const day = cfg.dayLabel || 'sunday', dateLabel = cfg.dateLabel || '15.11.2026';
+  const dayTime = cfg.time ? `${day} · ${cfg.time}` : day;
+  $$('[data-day]').forEach(el => el.textContent = day);
+  $$('[data-daytime]').forEach(el => el.textContent = dayTime);
+  $$('[data-date]').forEach(el => el.textContent = dateLabel);
+  if (cfg.time) $('[data-time-big]').textContent = cfg.time; else $('[data-time-wrap]').hidden = true;
   const details = $('[data-details]');
-  let anyDetail = false;
-  if (cfg.time) { $('[data-time]').textContent = cfg.time; $('[data-row="time"]').hidden = false; anyDetail = true; }
-  if (cfg.venue) { $('[data-venue]').textContent = cfg.venue; $('[data-row="venue"]').hidden = false; anyDetail = true; }
-  details.hidden = !anyDetail;
+  if (cfg.venue) { $('[data-venue]').textContent = cfg.venue; $('[data-row="venue"]').hidden = false; details.hidden = false; } else details.hidden = true;
+  // the white square on the card carries the location QR and opens the same link when tapped
+  const square = $('[data-square]');
+  if (cfg.mapUrl) { square.href = cfg.mapUrl; square.addEventListener('click', e => e.stopPropagation()); }
+  else { square.removeAttribute('href'); square.removeAttribute('target'); const im = $('img', square); if (im) im.remove(); }
   const rsvp = $('[data-rsvp]');
   rsvp.textContent = cfg.rsvpLabel || 'rsvp';
   if (cfg.rsvpUrl) { rsvp.href = cfg.rsvpUrl; rsvp.target = '_blank'; } else { rsvp.classList.add('is-pending'); rsvp.removeAttribute('href'); rsvp.setAttribute('aria-disabled', 'true'); }
@@ -45,13 +50,15 @@
     let dates;
     if (cfg.timeStart) {
       const s = cfg.timeStart.replace(':', '') + '00';
-      const e = (cfg.timeEnd || cfg.timeStart).replace(':', '') + '00';
+      let e;
+      if (cfg.timeEnd) e = cfg.timeEnd.replace(':', '') + '00';
+      else { const [hh, mm] = cfg.timeStart.split(':').map(Number); e = hh + 3 > 23 ? '235900' : String(hh + 3).padStart(2, '0') + String(mm).padStart(2, '0') + '00'; }   // default length: 3 hours
       dates = `${d}T${s}/${d}T${e}`;
     } else {
       const next = new Date(cfg.date + 'T00:00:00Z'); next.setUTCDate(next.getUTCDate() + 1);
       dates = `${d}/${next.toISOString().slice(0, 10).replace(/-/g, '')}`;
     }
-    const q = new URLSearchParams({ action: 'TEMPLATE', text: cfg.eventTitle || 'PROUD _ sweet bar', dates, details: "we're proud. are you?", location: cfg.venue || '' });
+    const q = new URLSearchParams({ action: 'TEMPLATE', text: cfg.eventTitle || 'PROUD _ sweet bar', dates, details: "we're proud. are you?", location: cfg.venue || cfg.mapUrl || '' });
     if (cfg.timeStart) q.set('ctz', 'Asia/Riyadh');
     cal.href = 'https://calendar.google.com/calendar/render?' + q.toString();
   }
@@ -286,6 +293,7 @@
     const when = gsap.timeline({ scrollTrigger: { trigger: '.when', start: 'top 72%', once: true } });
     when.to('.when__day .mask > span', { yPercent: 0, duration: 1, ease: 'expo.out' }, 0);
     when.to('.when__date .mask > span', { yPercent: 0, duration: 1.3, ease: 'expo.out' }, 0.12);
+    when.to('.when__time .mask > span', { yPercent: 0, duration: 1.1, ease: 'expo.out' }, 0.3);
     when.to('.when__rule', { scaleX: 1, duration: 1.2, ease: 'expo.out' }, 0.5);
     when.from(['.when__details', '.when__actions'], { opacity: 0, y: 14, duration: 1, ease: 'power2.out', stagger: 0.12 }, 0.7);
 
