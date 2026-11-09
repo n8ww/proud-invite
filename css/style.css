@@ -83,7 +83,7 @@ p, h1, dl, dd { margin: 0; }
 }
 .tray__text { position: absolute; inset: 0; text-align: center; }
 .tray__text > * { position: absolute; left: 12%; right: 12%; }
-.tray__title { top: 31.5%; font-weight: 600; font-size: 5.9cqh; line-height: 1.12; letter-spacing: -.005em; text-shadow: 0 1px 1px rgba(0,0,0,.25); }
+.tray__title { top: 33%; font-weight: 600; font-size: 4.7cqh; line-height: 1.12; letter-spacing: -.005em; text-shadow: 0 1px 1px rgba(0,0,0,.25); }
 .tray__brand { top: 57.5%; display: flex; justify-content: center; align-items: baseline; gap: .55em; font-size: 3.5cqh; opacity: 0; }
 .tray__brand .wordmark { font-size: 2.9em; align-self: center; clip-path: inset(0 100% 0 0); }
 .tray__when { top: 68.5%; font-size: 3.2cqh; line-height: 1.25; letter-spacing: .02em; opacity: 0; }
@@ -154,7 +154,7 @@ p, h1, dl, dd { margin: 0; }
 .card__still { position: absolute; height: 186.3%; width: auto; left: 50%; top: -42.2%; transform: translateX(-50%); max-width: none; pointer-events: none; }
 .card__text { position: absolute; inset: 0; text-align: center; color: var(--ink); }
 .card__text > * { position: absolute; left: 10%; right: 10%; }
-.card__title { top: 28.8%; font-weight: 600; font-size: 5.6cqh; line-height: 1.12; letter-spacing: -.005em; }
+.card__title { top: 30.4%; font-weight: 600; font-size: 4.7cqh; line-height: 1.12; letter-spacing: -.005em; }
 .card__title em { font-style: normal; color: var(--orange); }
 .card__body { top: 43.2%; font-weight: 500; font-size: 3.1cqh; line-height: 1.32; }
 .card__name { top: 55.9%; font-size: 2.6cqh; color: var(--orange); letter-spacing: .04em; }

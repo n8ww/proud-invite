@@ -50,10 +50,13 @@
     let dates;
     if (cfg.timeStart) {
       const s = cfg.timeStart.replace(':', '') + '00';
-      let e;
-      if (cfg.timeEnd) e = cfg.timeEnd.replace(':', '') + '00';
-      else { const [hh, mm] = cfg.timeStart.split(':').map(Number); e = hh + 3 > 23 ? '235900' : String(hh + 3).padStart(2, '0') + String(mm).padStart(2, '0') + '00'; }   // default length: 3 hours
-      dates = `${d}T${s}/${d}T${e}`;
+      let end;
+      if (cfg.timeEnd) end = `${d}T${cfg.timeEnd.replace(':', '')}00`;
+      else {   // default length: 3 hours, rolling past midnight when the start is late
+        const [y, mo, da] = cfg.date.split('-').map(Number), [hh, mm] = cfg.timeStart.split(':').map(Number);
+        end = new Date(Date.UTC(y, mo - 1, da, hh + 3, mm)).toISOString().slice(0, 19).replace(/[-:]/g, '');
+      }
+      dates = `${d}T${s}/${end}`;
     } else {
       const next = new Date(cfg.date + 'T00:00:00Z'); next.setUTCDate(next.getUTCDate() + 1);
       dates = `${d}/${next.toISOString().slice(0, 10).replace(/-/g, '')}`;
@@ -303,7 +306,7 @@
     card.call(() => sweep(cardGlint, 0.9), null, 0.55);
     const polish = () => sweep(cardGlint, 0.8);
     cardEl.addEventListener('click', polish);
-    cardEl.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); polish(); } });
+    cardEl.addEventListener('keydown', e => { if (e.target !== cardEl) return; if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); polish(); } });
 
     gsap.from('.end > *', { opacity: 0, y: 12, duration: 1.1, ease: 'power2.out', stagger: 0.1, scrollTrigger: { trigger: '.end', start: 'top 80%', once: true } });
   }
