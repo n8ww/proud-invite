@@ -40,7 +40,7 @@
   else { square.removeAttribute('href'); square.removeAttribute('target'); const im = $('img', square); if (im) im.remove(); }
   const rsvp = $('[data-rsvp]');
   rsvp.textContent = cfg.rsvpLabel || 'rsvp';
-  if (cfg.rsvpUrl) { rsvp.href = cfg.rsvpUrl; rsvp.target = '_blank'; } else { rsvp.classList.add('is-pending'); rsvp.removeAttribute('href'); rsvp.setAttribute('aria-disabled', 'true'); }
+  if (cfg.rsvpUrl) { rsvp.href = cfg.rsvpUrl; rsvp.target = '_blank'; rsvp.hidden = false; } else rsvp.hidden = true;   // no rsvp link = no rsvp button
   const map = $('[data-map]');
   if (cfg.mapUrl) { map.href = cfg.mapUrl; map.hidden = false; }
   const cal = $('[data-calendar]');
